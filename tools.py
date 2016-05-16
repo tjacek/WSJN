@@ -1,28 +1,28 @@
 import numpy as np
+import os,re
 from collections import defaultdict
 
-def create_histogram(ngrams):
-    names={}
-    names = defaultdict(lambda:0,names)
-    for ngram_i in ngrams:
-        if(ngram_i in names):
-            names[ngram_i]=names[ngram_i]+1.0
-        else:
-             names[ngram_i]=1.0
-    hist_size=len(names.keys())
-    hist=np.zeros((hist_size,))
-    for i,key in enumerate(names.keys()):
-        hist[i]=names[key]
-    hist/=np.sum(hist)
-    return hist
+def read_dataset(dir_path):
+    path_cats,cats=get_paths(dir_path)
+    dataset=[]
+    for path_i,cat_i in zip(path_cats,cats):
+        text_paths,names=get_paths(path_i)
+        text_files=[(cat_i,read_lines(text_path_i)) 
+                    for text_path_i in text_paths]
+        dataset+=text_files
+    print(len(dataset))
+    return dataset
 
-def get_ngrams(text,n=2):
-    assert type(text)==list
-    max_i=len(text)-n+1
-    print(len(text))
-    ngrams=["".join(text[i:i+n]) for i in range(max_i)]
-    #assert (len(text)-len(ngrams))==1
-    return ngrams
+def get_paths(path):
+    names=os.listdir(path)
+    paths=[path+"/"+name_i for name_i in names]
+    return paths,names
+
+def read_lines(filename):
+    txt = open(filename)
+    lines = txt.readlines()
+    lines=[clean(line_i) for line_i in lines]
+    return lines
 
 def read_text(filename,words=False):
     txt = open(filename)
@@ -36,12 +36,9 @@ def read_text(filename,words=False):
 
 def clean(text):
     text=text.lower()
+    text=text.replace(",","")
+    text=text.replace("\"","")
+    text = re.sub("\d+", "", text)
     return " ".join(text.split())
 
-path="PJN/pjn_lab1/54.txt"
-raw=read_text(path,False)
-ngrams=get_ngrams(raw,2)
-h=create_histogram(ngrams)
-print(h)
-#print(raw[0])
-#print(ngrams[0])
+read_dataset("lang")
