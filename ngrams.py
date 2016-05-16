@@ -24,19 +24,22 @@ class NgramDict(object):
         if(not token in self.indices):
             self.indices[token]=len(self)
 
-    def get_histogram(self,text):
+    def get_histogram(self,ngrams):
         hist=np.zeros((len(self),),dtype=float)
-        ngrams=get_ngrams(text)
         for ngram_i in ngrams:
             hist[self[ngram_i]]+=1.0
         return hist
 
 def dataset2ngrams(dataset,n=2):
     ngram_dict=NgramDict(n)
-    for cat_i,text_i in dataset:
-        ngrams_i=get_ngrams(text_i,n)
+    ngram_dataset=[ (cat_i,get_ngrams(text_i,n))  
+                    for cat_i,text_i in dataset]
+    for cat_i,ngrams_i in ngram_dataset:    
+        print(cat_i)
         ngram_dict.add_all(ngrams_i)
-    print(len(ngram_dict))	
+    hist_dataset=[ (cat_i,ngram_dict.get_histogram(ngrams_i)) 
+           for cat_i,ngrams_i in ngram_dataset]    
+    return ngram_dict,hist_dataset
 
 def make_ngram_dict(text,n=2):
     ngram_dict=NgramDict(n)
