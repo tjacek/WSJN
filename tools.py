@@ -1,5 +1,6 @@
 import numpy as np
 import os,re
+import codecs
 from collections import defaultdict
 
 def read_dataset(dir_path):
@@ -19,26 +20,41 @@ def get_paths(path):
     return paths,names
 
 def read_lines(filename):
-    txt = open(filename)
+    txt = codecs.open(filename,'r','ISO-8859-2')
+    #txt = open(filename)
     lines = txt.readlines()
     lines=[clean(line_i) for line_i in lines]
+    lines=" ".join(lines)
     return lines
 
 def read_text(filename,words=False):
     txt = open(filename)
     txt=txt.read()
     txt=clean(txt)
-    if(words):
-        text=txt.split(" ")
-    else:
-        text=[s_i for s_i in txt] 
+    #if(words):
+    #    text=txt.split(" ")
+    #else:
+    #    text=[s_i for s_i in txt] 
     return text
 
 def clean(text):
     text=text.lower()
-    text=text.replace(",","")
-    text=text.replace("\"","")
+    tabu=["\"",",",".","(",")"]
+    for token in tabu:
+        text=text.replace(token,"") 
     text = re.sub("\d+", "", text)
     return " ".join(text.split())
 
-read_dataset("lang")
+def read(path):
+    txt = open(path)
+    txt=txt.read()
+    return txt
+
+def save(path,text):
+    f = open(path,'w')
+    f.write(text)
+    f.close()
+
+def make_dir(path):
+    if(not os.path.isdir(path)):
+        os.mkdir(path)
