@@ -20,8 +20,7 @@ def get_paths(path):
     return paths,names
 
 def read_lines(filename):
-    txt = codecs.open(filename,'r','ISO-8859-2')
-    #txt = open(filename)
+    txt = codecs.open(filename,'r','utf8')
     lines = txt.readlines()
     lines=[clean(line_i) for line_i in lines]
     lines=" ".join(lines)
@@ -39,7 +38,7 @@ def read_text(filename,words=False):
 
 def clean(text):
     text=text.lower()
-    tabu=["\"",",",".","(",")"]
+    tabu=["\"",",",".","(",")","{","}","!","?"]
     for token in tabu:
         text=text.replace(token,"") 
     text = re.sub("\d+", "", text)

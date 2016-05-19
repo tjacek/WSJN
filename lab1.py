@@ -1,6 +1,6 @@
 import numpy as np
 import ngrams,tools,metrics
-import cmd
+import cmd,sys
 
 class Cls(object):
     def __init__(self,ngram_dict,dataset):
@@ -17,6 +17,7 @@ class Cls(object):
 def make_cls(path,n):
     dataset=tools.read_dataset(path)
     ngram_dict,hist_dataset=ngrams.dataset2ngrams(dataset,n)
+    print(len(ngram_dict))
     return Cls(ngram_dict,hist_dataset)
 
 def knn(vect,dataset,metric):
@@ -29,15 +30,23 @@ def knn(vect,dataset,metric):
     return cats[i]
 
 def main_loop(n):
-    cls=make_cls("lang",n)
+    cls=make_cls("lang_utf8",n)
     while(True):
-        cls_lang(cls)
+        if(not cls_lang(cls)):
+            break
 
 def cls_lang(cls):
-    raw_text = raw_input("Enter sentences ")
+    raw_text = raw_input("Enter sentences ").decode('utf-8')
     print("\n \n")
+    if(raw_text=="quit"):
+        return False
     cat=cls.predict(raw_text)
     print(cat)
+    return True
 
 if __name__ == "__main__":
-    main_loop(2)
+    if len(sys.argv) < 2:
+        n=2
+    else:
+        n=int(sys.argv[1])
+    main_loop(n)

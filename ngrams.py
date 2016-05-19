@@ -5,7 +5,6 @@ class NgramDict(object):
     def __init__(self,n=2):
         self.indices={}
         self.n=n
-        self.size=0
 
     def __len__(self):
         return len(self.indices.keys())
@@ -14,7 +13,7 @@ class NgramDict(object):
         return str(self.indices.keys())
 
     def __getitem__(self, key):
-        return self.indices[key]
+        return self.indices.get(key,np.inf)
 
     def add_all(self,ngrams):
         for ngram_i in ngrams:
@@ -27,8 +26,10 @@ class NgramDict(object):
     def get_histogram(self,ngrams_text):
         hist=np.zeros((len(self),),dtype=float)
         for ngram_i in ngrams_text:
-            hist[self[ngram_i]]+=1.0
-        hist/=sum(hist)
+            index=self[ngram_i]
+            if(index!=np.inf):
+                hist[index]+=1.0
+        hist/=np.sum(hist)
         return hist
 
 def dataset2ngrams(dataset,n=2):
@@ -54,7 +55,3 @@ def get_ngrams(text,n=2):
     max_i=len(text)-n+1
     ngrams=[text[i:i+n] for i in range(max_i)]
     return ngrams
-
-#ngram_dict,hist=make_ngram_dict("przetwarzanie")
-#print(str(hist))
-#print(str(ngram_dict.indices))
