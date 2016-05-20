@@ -19,21 +19,19 @@ def get_paths(path):
     paths=[path+"/"+name_i for name_i in names]
     return paths,names
 
-def read_lines(filename):
+def read_lines(filename,clean_text=True):
     txt = codecs.open(filename,'r','utf8')
     lines = txt.readlines()
-    lines=[clean(line_i) for line_i in lines]
+    if(clean_text):
+        lines=[clean(line_i) for line_i in lines]
     lines=" ".join(lines)
     return lines
 
-def read_text(filename,words=False):
+def read_text(filename,clean_txt=True):
     txt = open(filename)
     txt=txt.read()
-    txt=clean(txt)
-    #if(words):
-    #    text=txt.split(" ")
-    #else:
-    #    text=[s_i for s_i in txt] 
+    if(clean_text):
+        txt=clean(txt)
     return text
 
 def clean(text):

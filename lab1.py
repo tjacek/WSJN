@@ -2,6 +2,8 @@ import numpy as np
 import ngrams,tools,metrics
 import cmd,sys
 
+DATASET_SOURCE="resources/lang_utf8"
+
 class Cls(object):
     def __init__(self,ngram_dict,dataset):
         self.ngram_dict=ngram_dict
@@ -30,7 +32,7 @@ def knn(vect,dataset,metric):
     return cats[i]
 
 def main_loop(n):
-    cls=make_cls("lang_utf8",n)
+    cls=make_cls(DATASET_SOURCE,n)
     while(True):
         if(not cls_lang(cls)):
             break
