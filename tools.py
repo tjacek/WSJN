@@ -3,6 +3,7 @@ import numpy as np
 import os,re
 import codecs
 from collections import defaultdict
+import timeit
 
 def read_dataset(dir_path):
     path_cats,cats=get_paths(dir_path)
@@ -58,3 +59,13 @@ def save(path,text):
 def make_dir(path):
     if(not os.path.isdir(path)):
         os.mkdir(path)
+
+def clock(func):
+    def inner_func(*args):
+        start_time=timeit.default_timer()
+        result=func(*args)
+        end_time = timeit.default_timer()
+        total_time = (end_time - start_time)
+        print("time %d ",total_time)
+        return result
+    return inner_func
