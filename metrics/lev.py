@@ -47,12 +47,18 @@ def equ(l1,l2):
     return int(not l1==l2)
 
 def correct_word(new,words):
-    print(type(words))
+    words=eff_heuristic(new,words)
     print(len(words))
     dist=[lev(new,word_i) for word_i in words] 
     index=np.argmin(dist)
-    print(index)
     return words[index]
+
+def eff_heuristic(new,words,fact=0.5):
+    def prop(word_i):
+        return float(len(word_i))/float(len(new))
+    new_words=[word_i for word_i in words
+                   if prop(word_i)>0.5 and prop(word_i)<1.5]
+    return new_words
 
 def curry_correct(words):
     return lambda new:correct_word(new,words)
