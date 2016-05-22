@@ -5,9 +5,14 @@ from sets import Set
 
 POLISH_TO_LATIN={'ą':'a','ę':'e','ó':'o',
                  'ś':'s','ł':'l','ż':'z',
-                 'ź':'z','ć':'c','ń':'n'}
+                 'ź':'z','ć':'c','ń':'n',
+                 'u':'ó'}
 
-def lev_cont(word1,word2):
+DIGRAPHS={'ż':'rz','h':'ch','ć':'ci',
+          'ń':'ni','ś':'si','ź':'zi',
+          'ą':'om','ę':'em'}
+
+def lev_cxt(word1,word2):
     n=len(word1)
     m=len(word2)
     dist=np.zeros((n+1,m+1))
@@ -16,22 +21,27 @@ def lev_cont(word1,word2):
     for j in range(m+1):
         dist[0][j]=j
     for i in range(1,n+1):
-        for j in range(1,m+1):
-            l1=dist[i-1][j]+1
-            l2=dist[i][j-1]+1
-            c1,c2=context(i,j,word1,word2)
-            l3=dist[i-1][j-1]+equ(word1[i],word2[j],c1,c2)
+        for j in range(1,m+1):   
+            c1,c2=context(i-1,j-1,word1,word2)
+            l1=dist[i-1][j]+ 1
+            l2=dist[i][j-1]+ 1
+            l3=dist[i-1][j-1]+di_ctx(word1[i-1],word2[j-1],c1,c2)
             dist[i][j]=min([l1,l2,l3])
     return dist[n-1][m-1]
 
 def context(i,j,word1,word2):
     c1=None
     c2=None
-    if(i+1<len(word1)):
-        c1=word1[i]
-    if(j+1<len(word2)):
-        c2=word1[j]
+    if(i>0):
+        c1=word1[i-1]
+    if(j>0):
+        c2=word2[j-1]
     return c1,c2
+
+def di_ctx(word1,word2,c1,c2):
+    d1=di_correction(word1,c2,word2)
+    d2=di_correction(word2,c1,word1)
+    return d1+d2
 
 def lev(word1,word2):
     n=len(word1)
@@ -43,15 +53,24 @@ def lev(word1,word2):
         dist[0][j]=j
     for i in range(1,n+1):
         for j in range(1,m+1):
-            l1=dist[i-1][j]+1.0
-            l2=dist[i][j-1]+1.0
+            l1=dist[i-1][j] + 1.0
+            l2=dist[i][j-1] + 1.0
             l3=dist[i-1][j-1]+orth_correction(word1[i-1],word2[j-1])  
-            #l3=dist[i-1][j-1]+equ(word1[i-1],word2[j-1])
             dist[i][j]=min([l1,l2,l3])
     return dist[n][m]
 
 def equ(l1,l2):
     return int(not l1==l2)
+
+def di_correction(token1,prev,token2):
+    if(prev==None):
+        return 1.0
+    #print(token1+'-'+token2+next)
+    if(token1 in DIGRAPHS):
+        di=prev+token2      
+        if(DIGRAPHS[token1]==di):
+            return 0.2
+    return equ(token1,token2)
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
@@ -66,7 +85,7 @@ def orth_correction(token1,token2):
 def correct_word(new,words):
     words=eff_heuristic(new,words)
     print(len(words))
-    dist=[lev(new,word_i) for word_i in words] 
+    dist=[lev_cxt(new,word_i) for word_i in words] 
     dist=np.array(dist)
     index=np.argmin(dist)
     return words[index]
@@ -82,6 +101,5 @@ def curry_correct(words):
     return lambda new:correct_word(new,words)
 
 if __name__ == "__main__":
-    print(lev("żółć".decode('utf-8'),"zolc".decode('utf-8')))
-    #print(lev("żółć".decode('utf-8'),"zol".decode('utf-8')))    
-    print(lev("zolc".decode('utf-8'),"zol".decode('utf-8')))
+    print(lev("chak".decode('utf-8'),"cha".decode('utf-8')))
+    print(lev("chak".decode('utf-8'),"hak".decode('utf-8')))
