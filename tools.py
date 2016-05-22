@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import os,re
 import codecs
@@ -21,10 +22,12 @@ def get_paths(path):
 
 def read_lines(filename,clean_text=True):
     txt = codecs.open(filename,'r','utf8')
-    lines = txt.readlines()
+    lines = txt.read()#lines()
+    lines=lines.split('\n')
+    lines=[line_i for line_i in lines
+            if len(line_i)>0]
     if(clean_text):
         lines=[clean(line_i) for line_i in lines]
-    lines=" ".join(lines)
     return lines
 
 def read_text(filename,clean_txt=True):
