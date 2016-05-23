@@ -20,6 +20,7 @@ DIGRAPHS_TO_SPECIAL={u'rz':DI_CODES[0],u'ch':DI_CODES[1],
 SPECIAL_TO_DIGRAPH = dict((v,k) for k,v in DIGRAPHS_TO_SPECIAL.iteritems())
 
 def code_digraphs(word):
+    print(word)
     for key_i,value_i in DIGRAPHS_TO_SPECIAL.iteritems():
         word=word.replace(key_i,value_i)
     print(word)
@@ -35,22 +36,11 @@ def lev_cxt(word1,word2):
         dist[0][j]=j
     for i in range(1,n+1):
         for j in range(1,m+1):   
-            c1,c2=context(i,j,word1,word2)
             l1=dist[i-1][j] + 1.0
             l2=dist[i][j-1]+ 1.0
             l3=dist[i-1][j-1]+ full_cost(word1[i-1],word2[j-1])
             dist[i][j]=min([l1,l2,l3])
-    #print(dist)
     return dist[n][m]
-
-def context(i,j,word1,word2):
-    c1=None
-    c2=None
-    if(i<len(word1)-1):
-        c1=word1[i]
-    if(j<len(word2)):
-        c2=word2[j]
-    return c1,c2
 
 def full_cost(token1,token2):
     d1=di_correction(token1,token2)
@@ -59,8 +49,7 @@ def full_cost(token1,token2):
     d2=di_correction(token2,token1)
     if(d2!=0.0):
         return d2
-    return equ(token1,token2)
-
+    return simple_cost(token1,token2)
 
 def simple_cost(token1,token2):
     d1=orth_correction(token1,token2)
@@ -77,20 +66,19 @@ def di_correction(token1,token2):
         code=DIGRAPHS_TO_SPECIAL[di]
         if(code==token2):
             return 0.1
-    #if(token1 in SPECIAL_TO_DIGRAPH):
-    #    di=SPECIAL_TO_DIGRAPH[token1]
-    #    if(di[0]==token2 or di[1]==token2):
-    #        #print("ok")
-    #        return 0.1
+    if(token1 in SPECIAL_TO_DIGRAPH):
+        di=SPECIAL_TO_DIGRAPH[token1]
+        if(token2==di[0] or token2==di[1]):
+            return 0.2
     return 0.0
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token1]==token2):
-            return 0.2
+            return 0.3
     if(token2 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token2]==token1):
-            return 0.2
+            return 0.3
     return 0.0#equ(token1,token2)
 
 @tools.clock
