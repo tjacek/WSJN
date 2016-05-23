@@ -36,10 +36,18 @@ def lev_cxt(word1,word2):
         dist[0][j]=j
     for i in range(1,n+1):
         for j in range(1,m+1):   
-            l1=dist[i-1][j] + 1.0
-            l2=dist[i][j-1]+ 1.0
-            l3=dist[i-1][j-1]+ full_cost(word1[i-1],word2[j-1])
-            dist[i][j]=min([l1,l2,l3])
+            if( (1<i and 1<j) and word1[i-1]==word2[j-2] 
+                     and word1[i-2]==word2[j-1]):
+                l1=dist[i-1][j] + 1.0
+                l2=dist[i][j-1] + 1.0
+                l3=dist[i-1][j-1] + full_cost(word1[i-1],word2[j-1])
+                l4=dist[i-2][j-2] + 1.0
+                dist[i][j]=min([l1,l2,l3,l4])
+            else:
+                l1=dist[i-1][j] + 1.0
+                l2=dist[i][j-1]+ 1.0
+                l3=dist[i-1][j-1]+ full_cost(word1[i-1],word2[j-1])
+                dist[i][j]=min([l1,l2,l3])
     return dist[n][m]
 
 def full_cost(token1,token2):
