@@ -20,10 +20,10 @@ DIGRAPHS_TO_SPECIAL={u'rz':DI_CODES[0],u'ch':DI_CODES[1],
 SPECIAL_TO_DIGRAPH = dict((v,k) for k,v in DIGRAPHS_TO_SPECIAL.iteritems())
 
 def code_digraphs(word):
-    print(word)
+    #print(word)
     for key_i,value_i in DIGRAPHS_TO_SPECIAL.iteritems():
         word=word.replace(key_i,value_i)
-    print(word)
+    #print(word)
     return word
 
 def lev_cxt(word1,word2):
@@ -73,42 +73,44 @@ def di_correction(token1,token2):
         di=DIGRAPHS[token1]
         code=DIGRAPHS_TO_SPECIAL[di]
         if(code==token2):
-            return 0.1
+            return 0.2
     if(token1 in SPECIAL_TO_DIGRAPH):
         di=SPECIAL_TO_DIGRAPH[token1]
         if(token2==di[0] or token2==di[1]):
-            return 0.2
+            return 0.2#0.2
     return 0.0
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token1]==token2):
-            return 0.3
+            return 0.1#0.3
     if(token2 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token2]==token1):
-            return 0.3
+            return 0.1#0.3
     return 0.0#equ(token1,token2)
 
 @tools.clock
-def correct_word(new,raw_words):
-    full_words=eff_heuristic(new,raw_words)
-    print(len(full_words))
+def correct_word(new,coded_words,raw_words):
+    eff_words,indexes=eff_heuristic(new,coded_words)
+    #print(len(full_words))
     new=code_digraphs(new)
-    words=[code_digraphs(word_i) for word_i in full_words]
-    dist=[lev_cxt(new,word_i) for word_i in words] 
+    #words=[code_digraphs(word_i) for word_i in full_words]
+    dist=[lev_cxt(new,word_i) for word_i in eff_words] 
     dist=np.array(dist)
     index=np.argmin(dist)
-    return full_words[index]
+    return raw_words[indexes[index]]
 
 def eff_heuristic(new,words,fact=0.5):
     def prop(word_i):
         return float(len(new))/float(len(word_i))
-    new_words=[word_i for word_i in words
+    tuples=[ (i,word_i) for i,word_i in enumerate(words)
                    if prop(word_i)>0.5 and prop(word_i)<1.5]
-    return new_words
+    indexes=[tuple_i[0] for tuple_i in tuples]
+    new_words=[tuple_i[1] for tuple_i in tuples]
+    return new_words,indexes
 
-def curry_correct(words):
-    return lambda new:correct_word(new,words)
+def curry_correct(coded_words,raw_words):
+    return lambda new:correct_word(new,coded_words,raw_words)
 
 def lev(word1,word2):
     n=len(word1)
