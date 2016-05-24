@@ -69,3 +69,8 @@ def clock(func):
         print("time %d ",total_time)
         return result
     return inner_func
+
+def ui_loop(cls,fun):
+    while(True):
+        if(not fun(cls)):
+            break
