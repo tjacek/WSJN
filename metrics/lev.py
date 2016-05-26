@@ -12,7 +12,7 @@ DIGRAPHS={u'ż':u'rz',u'h':u'ch',u'ć':u'ci',
           u'ń':u'ni',u'ś':u'si',u'ź':u'zi'}
           #u'ą':u'om',u'ę':u'em'}
 
-DI_CODES=u'!?&$^*'
+DI_CODES=u'!@#$%^&*'
 DIGRAPHS_TO_SPECIAL={u'rz':DI_CODES[0],u'ch':DI_CODES[1],
                      u'ci':DI_CODES[2],u'ni':DI_CODES[3],
                      u'si':DI_CODES[4],u'zi':DI_CODES[5]}
@@ -92,22 +92,48 @@ def orth_correction(token1,token2):
 @tools.clock
 def correct_word(new,coded_words,raw_words):
     eff_words,indexes=eff_heuristic(new,coded_words)
-    #print(len(full_words))
+    print(len(eff_words))
     new=code_digraphs(new)
-    #words=[code_digraphs(word_i) for word_i in full_words]
-    dist=[lev_cxt(new,word_i) for word_i in eff_words] 
+    dist=[lev(new,word_i) for word_i in eff_words] 
     dist=np.array(dist)
     index=np.argmin(dist)
-    return raw_words[indexes[index]]
+    return  raw_words[indexes[index]]
 
-def eff_heuristic(new,words,fact=0.5):
-    def prop(word_i):
-        return float(len(new))/float(len(word_i))
-    tuples=[ (i,word_i) for i,word_i in enumerate(words)
-                   if prop(word_i)>0.5 and prop(word_i)<1.5]
-    indexes=[tuple_i[0] for tuple_i in tuples]
-    new_words=[tuple_i[1] for tuple_i in tuples]
-    return new_words,indexes
+def nearest(new_word,keys):
+    dist=[lev_cxt(new_word,key_i) for key_i in keys] 
+    dist=np.array(dist)
+    index=np.argmin(dist)
+    return keys[index]
+
+def nearest_eff(new_word,keys):
+    best=np.inf
+    best_index=0
+    for i,key_i in enumerate(keys):
+        if(size_cond(best,new_word,key_i)):
+            d=lev_cxt(new_word,key_i)  
+            if(d<best):
+                best=d
+                best_index=i
+    return keys[best_index]
+
+def size_cond(threshold,word1,word2):
+    return np.abs(len(word1)-len(word2))<threshold
+#def eff_heuristic(new,words,p=0.5):
+#    new_size=len(new)
+#    tuples=[ (i,word_i) for i,word_i in enumerate(words)
+#                   if size_heuristic(word_i,new_size)]
+#    indexes=[tuple_i[0] for tuple_i in tuples]
+#    new_words=[tuple_i[1] for tuple_i in tuples]
+#    return new_words,indexes
+
+#def size_heuristic(word_i,size,delta=3):
+#    cnd_size=len(word_i)
+#    return cnd_size>size-delta and cnd_size<size+delta
+
+#def prop_heuristic(new,word_i):
+#    def prop(word_i):
+#        return float(len(new))/float(len(word_i))
+#    return prop(word_i)>0.5 and prop(word_i)<1.5
 
 def curry_correct(coded_words,raw_words):
     return lambda new:correct_word(new,coded_words,raw_words)
@@ -124,7 +150,7 @@ def lev(word1,word2):
         for j in range(1,m+1):
             l1=dist[i-1][j] +1.0
             l2=dist[i][j-1] + 1.0
-            l3=dist[i-1][j-1]+simple_ort(word1[i-1],word2[j-1])  
+            l3=dist[i-1][j-1]+1.0 
             dist[i][j]=min([l1,l2,l3])
     return dist[n][m]
 
