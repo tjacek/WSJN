@@ -121,14 +121,33 @@ def nearest_k(new_word,keys,k=10):
     dists=np.array(dists)
     dist_inds=dists.argsort()[0:k]
     k_words=[ keys[i] for i in dist_inds]
-    print([ dists[i] for i in dist_inds])
+    #print([ dists[i] for i in dist_inds])
+    return k_words
+
+@tools.clock
+def nearest_k_eff(new_word,keys,k=10):
+    best=np.full((k,),np.inf)
+    indexes=np.zeros(k,dtype=int)
+    for i,key_i in enumerate(keys):
+        if(size_cond(best[-1],new_word,key_i)):
+            d=lev_cxt(new_word,key_i)  
+            update_best(d,i,best,indexes,k)
+        #print(best)
+    k_words=[ keys[i] for i in indexes]
     return k_words
 
 def size_cond(threshold,word1,word2):
     return np.abs(len(word1)-len(word2))<threshold
 
-def curry_correct(coded_words,raw_words):
-    return lambda new:correct_word(new,coded_words,raw_words)
+def update_best(new,new_index,best,best_index,k):
+    index=-1
+    for i,best_i in enumerate(best):
+        if(new<best_i):
+            index=i
+            break
+    if(index>=0):
+        best[index]=new
+        best_index[index]=new_index
 
 def lev(word1,word2):
     n=len(word1)

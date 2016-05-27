@@ -21,7 +21,7 @@ class Forms(object):
     def full_words(self,begin):
         full_words=[]
         for begin_i in begin: 
-            #print(unicode(begin_i))
+            print(unicode(begin_i))
             endings_k=self.endings[begin_i]
             words_i=[begin_i+end_i for end_i in endings_k]
             full_words+=words_i
@@ -29,7 +29,7 @@ class Forms(object):
 
     def nearest_begin(self,new_word):
         keys=self.endings.keys()
-        return distance.nearest_k(new_word,keys)
+        return distance.nearest_k_eff(new_word,keys)#.nearest_k(new_word,keys)
         
     def all_forms(self):
         all_words=[]
