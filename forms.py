@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 import tools
 import metrics.lev as distance
+from metrics.lev import code_digraphs
 import numpy as np
+import codecs
+import sys 
 
 class Forms(object):
     def __init__(self,endings):
@@ -16,15 +19,23 @@ class Forms(object):
         return words[index]	
 
     def full_words(self,begin):
-    	endings_k=self.endings[begin]
-        return [begin+end_i for end_i in endings_k]
+        full_words=[]
+        for begin_i in begin: 
+            #print(unicode(begin_i))
+            endings_k=self.endings[begin_i]
+            words_i=[begin_i+end_i for end_i in endings_k]
+            full_words+=words_i
+        return full_words
 
     def nearest_begin(self,new_word):
-    	keys=self.endings.keys()
-        dist=[distance.lev_cxt(new_word,key_i) for key_i in keys] 
-        dist=np.array(dist)
-        index=np.argmin(dist)
-        return keys[index]	
+        keys=self.endings.keys()
+        return distance.nearest_k(new_word,keys)
+        
+    def all_forms(self):
+        all_words=[]
+        for key_i in self.endings:
+            all_words+=self.full_words(key_i)
+        return all_words
 
 def build_forms(begin_file,end_file):
     begin_lines=tools.read_lines(begin_file,clean_text=False)
@@ -38,7 +49,13 @@ def parse_begin(lines):
     lines=[line_i.split(u':') for line_i in lines]
     lines=[(line_i[0],int(line_i[1])) for line_i in lines
                             if len(line_i)==2]
-    return dict(lines)
+    begin={}
+    for key_i,value_i in lines:
+        if(key_i in begin):
+            begin[key_i].append(value_i)
+        else:
+            begin[key_i]=[value_i]
+    return dict(begin)
 
 def parse_end(lines):
     lines=[line_i.split(u';') for line_i in lines]
@@ -51,14 +68,22 @@ def parse_end(lines):
                    for line_i in lines]
     return dict(lines)
 
-def unify_dirs(key_dir,valu_dir):
+def unify_dirs(key_dir,value_dir):
     new_dir={}
     for key_i in key_dir:
         index=key_dir[key_i]
-        new_dir[key_i]=valu_dir[index]		
+        #new_dir[key_i]=valu_dir[index]
+        all_endings=[]
+        for end_i in index:
+            all_endings+=value_dir[end_i]
+        new_dir[code_digraphs(key_i)]=[code_digraphs(value_i) 
+                                         for value_i in all_endings]	
     return new_dir	
 
-forms=build_forms(u'resources/lab2/pocz.dat',
-	         u'resources/lab2/konc.dat')
+#forms=build_forms(u'resources/lab2/pocz.dat',
+#	         u'resources/lab2/konc.dat')
 
-print(forms.get_ending('a'))
+
+#all_form=forms.all_forms()
+#for form_i in all_form:
+#    print(form_i)

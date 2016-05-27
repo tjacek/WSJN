@@ -73,20 +73,20 @@ def di_correction(token1,token2):
         di=DIGRAPHS[token1]
         code=DIGRAPHS_TO_SPECIAL[di]
         if(code==token2):
-            return 0.2
+            return 0.1
     if(token1 in SPECIAL_TO_DIGRAPH):
         di=SPECIAL_TO_DIGRAPH[token1]
         if(token2==di[0] or token2==di[1]):
-            return 0.2#0.2
+            return 0.1#0.2
     return 0.0
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token1]==token2):
-            return 0.1#0.3
+            return 0.2#0.3
     if(token2 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token2]==token1):
-            return 0.1#0.3
+            return 0.2#0.3
     return 0.0#equ(token1,token2)
 
 @tools.clock
@@ -116,24 +116,16 @@ def nearest_eff(new_word,keys):
                 best_index=i
     return keys[best_index]
 
+def nearest_k(new_word,keys,k=10):
+    dists=[lev_cxt(new_word,key_i) for key_i in keys] 
+    dists=np.array(dists)
+    dist_inds=dists.argsort()[0:k]
+    k_words=[ keys[i] for i in dist_inds]
+    print([ dists[i] for i in dist_inds])
+    return k_words
+
 def size_cond(threshold,word1,word2):
     return np.abs(len(word1)-len(word2))<threshold
-#def eff_heuristic(new,words,p=0.5):
-#    new_size=len(new)
-#    tuples=[ (i,word_i) for i,word_i in enumerate(words)
-#                   if size_heuristic(word_i,new_size)]
-#    indexes=[tuple_i[0] for tuple_i in tuples]
-#    new_words=[tuple_i[1] for tuple_i in tuples]
-#    return new_words,indexes
-
-#def size_heuristic(word_i,size,delta=3):
-#    cnd_size=len(word_i)
-#    return cnd_size>size-delta and cnd_size<size+delta
-
-#def prop_heuristic(new,word_i):
-#    def prop(word_i):
-#        return float(len(new))/float(len(word_i))
-#    return prop(word_i)>0.5 and prop(word_i)<1.5
 
 def curry_correct(coded_words,raw_words):
     return lambda new:correct_word(new,coded_words,raw_words)
