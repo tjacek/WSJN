@@ -26,16 +26,23 @@ def code_digraphs(word):
     #print(word)
     return word
 
+def decode_digraphs(word):
+    #print(word)
+    for key_i,value_i in DIGRAPHS_TO_SPECIAL.iteritems():
+        word=word.replace(value_i,key_i)
+    #print(word)
+    return word
+
 def lev_cxt(word1,word2):
     n=len(word1)
     m=len(word2)
     dist=np.zeros((n+1,m+1))
-    for i in range(n+1):
+    for i in xrange(n+1):
         dist[i][0]=i 
-    for j in range(m+1):
+    for j in xrange(m+1):
         dist[0][j]=j
-    for i in range(1,n+1):
-        for j in range(1,m+1):   
+    for i in xrange(1,n+1):
+        for j in xrange(1,m+1):   
             if( (1<i and 1<j) and word1[i-1]==word2[j-2] 
                      and word1[i-2]==word2[j-1]):
                 l1=dist[i-1][j] + 1.0
@@ -73,20 +80,20 @@ def di_correction(token1,token2):
         di=DIGRAPHS[token1]
         code=DIGRAPHS_TO_SPECIAL[di]
         if(code==token2):
-            return 0.1
+            return 0.2
     if(token1 in SPECIAL_TO_DIGRAPH):
         di=SPECIAL_TO_DIGRAPH[token1]
         if(token2==di[0] or token2==di[1]):
-            return 0.1#0.2
+            return 0.2#0.2
     return 0.0
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token1]==token2):
-            return 0.2#0.3
+            return 0.1#0.3
     if(token2 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token2]==token1):
-            return 0.2#0.3
+            return 0.1#0.3
     return 0.0#equ(token1,token2)
 
 @tools.clock
@@ -105,10 +112,12 @@ def nearest(new_word,keys):
     index=np.argmin(dist)
     return keys[index]
 
+@tools.clock
 def nearest_eff(new_word,keys):
     best=np.inf
     best_index=0
-    for i,key_i in enumerate(keys):
+    for i in xrange(len(keys)):
+        key_i=keys[i]
         if(size_cond(best,new_word,key_i)):
             d=lev_cxt(new_word,key_i)  
             if(d<best):
@@ -116,19 +125,12 @@ def nearest_eff(new_word,keys):
                 best_index=i
     return keys[best_index]
 
-def nearest_k(new_word,keys,k=10):
-    dists=[lev_cxt(new_word,key_i) for key_i in keys] 
-    dists=np.array(dists)
-    dist_inds=dists.argsort()[0:k]
-    k_words=[ keys[i] for i in dist_inds]
-    #print([ dists[i] for i in dist_inds])
-    return k_words
-
-@tools.clock
+#@tools.clock
 def nearest_k_eff(new_word,keys,k=10):
     best=np.full((k,),np.inf)
     indexes=np.zeros(k,dtype=int)
-    for i,key_i in enumerate(keys):
+    for i in xrange(len(keys)):
+        key_i=keys[i]
         if(size_cond(best[-1],new_word,key_i)):
             d=lev_cxt(new_word,key_i)  
             update_best(d,i,best,indexes,k)
@@ -136,12 +138,10 @@ def nearest_k_eff(new_word,keys,k=10):
     k_words=[ keys[i] for i in indexes]
     return k_words
 
-def size_cond(threshold,word1,word2):
-    return np.abs(len(word1)-len(word2))<threshold
-
 def update_best(new,new_index,best,best_index,k):
     index=-1
-    for i,best_i in enumerate(best):
+    for i in xrange(k):
+        best_i=best[i]
         if(new<best_i):
             index=i
             break
