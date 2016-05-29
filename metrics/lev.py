@@ -125,30 +125,6 @@ def nearest_eff(new_word,keys):
                 best_index=i
     return keys[best_index]
 
-#@tools.clock
-def nearest_k_eff(new_word,keys,k=10):
-    best=np.full((k,),np.inf)
-    indexes=np.zeros(k,dtype=int)
-    for i in xrange(len(keys)):
-        key_i=keys[i]
-        if(size_cond(best[-1],new_word,key_i)):
-            d=lev_cxt(new_word,key_i)  
-            update_best(d,i,best,indexes,k)
-        #print(best)
-    k_words=[ keys[i] for i in indexes]
-    return k_words
-
-def update_best(new,new_index,best,best_index,k):
-    index=-1
-    for i in xrange(k):
-        best_i=best[i]
-        if(new<best_i):
-            index=i
-            break
-    if(index>=0):
-        best[index]=new
-        best_index[index]=new_index
-
 def lev(word1,word2):
     n=len(word1)
     m=len(word2)
