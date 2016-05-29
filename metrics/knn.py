@@ -27,9 +27,12 @@ def nearest_radius(new_word,keys,eps=3.0,metric=begin_metric):
     return k_words
 
 @tools.clock
-def nearest_radius_eff(new_word,keys,eps=3.0,max_diff=3,metric=begin_metric):
+def nearest_radius_eff(new_word,keys,eps=2.0,max_diff=3.0,metric=begin_metric):
     #best=[]
     indexes=[]
+    half_size=float(len(new_word))/2.0
+    if( half_size<max_diff):
+        max_diff=half_size
     for i in xrange(len(keys)):
         key_i=keys[i]
         if(size_cond(max_diff,new_word,key_i)):
@@ -73,19 +76,25 @@ def nearest_k(new_word,keys,k=10,metric=lev.lev_cxt):
     k_words=[ keys[i] for i in dist_inds]
     return k_words
 
-def nearest_k_eff(new_word,keys,k=5,metric=begin_metric):
+@tools.clock
+def nearest_k_eff(new_word,keys,k=7,metric=begin_metric):
     best=np.full((k,),np.inf)
     indexes=np.zeros(k,dtype=int)
     best_full=np.inf
+    n=0
     for i in xrange(len(keys)):
         key_i=keys[i]
-        if(size_cond(best_full,new_word,key_i)):
+        if(size_cond(best[-1],new_word,key_i)):
             d,diff=metric(new_word,key_i)  
             full_dist=d+diff
-            update_best(d,i,best,indexes,k)
+            update_best(full_dist,i,best,indexes,k)
             if(full_dist<best_full):
                 best_full=full_dist
+            n+=1
+    print(n)    
     k_words=[keys[i] for i in indexes]
+    for word_i in k_words:
+        print(word_i)
     return k_words
 
 def update_best(new,new_index,best,best_index,k):

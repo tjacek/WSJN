@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import os,re
-import codecs
+import codecs,sys 
 from collections import defaultdict
 import timeit
 
@@ -66,7 +66,7 @@ def clock(func):
         result=func(*args)
         end_time = timeit.default_timer()
         total_time = (end_time - start_time)
-        print("time %d ",total_time)
+        print("time %i ",total_time)
         return result
     return inner_func
 
@@ -74,3 +74,10 @@ def ui_loop(cls,fun):
     while(True):
         if(not fun(cls)):
             break
+
+def unique_list(list_i):
+    return list(set(list_i))
+
+def use_utf8():
+    UTF8Writer = codecs.getwriter('utf8')
+    sys.stdout = UTF8Writer(sys.stdout)
