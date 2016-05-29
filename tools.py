@@ -5,6 +5,9 @@ import codecs,sys
 from collections import defaultdict
 import timeit
 
+def find_words(text):
+    return re.findall(u'[(a-z)|ż|ź|ć|ź|ń|ó|ł|ą|ę]+', text.lower()) 
+
 def read_dataset(dir_path):
     path_cats,cats=get_paths(dir_path)
     dataset=[]
@@ -34,9 +37,15 @@ def read_lines(filename,clean_text=True):
 def read_text(filename,clean_txt=True):
     txt = open(filename)
     txt=txt.read()
-    if(clean_text):
+    if(clean_txt):
         txt=clean(txt)
-    return text
+    return txt
+
+def read_pairs(filename,sep=';'):
+    lines=read_lines(filename,clean_text=True)
+    pairs=[ tuple(line_i.split(sep)) for line_i in lines]
+    print(pairs[0:10])
+    return pairs 
 
 def clean(text):
     text=text.lower()
