@@ -106,25 +106,6 @@ def correct_word(new,coded_words,raw_words):
     index=np.argmin(dist)
     return  raw_words[indexes[index]]
 
-def nearest(new_word,keys):
-    dist=[lev_cxt(new_word,key_i) for key_i in keys] 
-    dist=np.array(dist)
-    index=np.argmin(dist)
-    return keys[index]
-
-@tools.clock
-def nearest_eff(new_word,keys):
-    best=np.inf
-    best_index=0
-    for i in xrange(len(keys)):
-        key_i=keys[i]
-        if(size_cond(best,new_word,key_i)):
-            d=lev_cxt(new_word,key_i)  
-            if(d<best):
-                best=d
-                best_index=i
-    return keys[best_index]
-
 def lev(word1,word2):
     n=len(word1)
     m=len(word2)
@@ -142,5 +123,5 @@ def lev(word1,word2):
     return dist[n][m]
 
 if __name__ == "__main__":
-    print(lev("chak".decode('utf-8'),"cha".decode('utf-8')))
-    print(lev("chak".decode('utf-8'),"hak".decode('utf-8')))
+    print(lev_cxt("chak".decode('utf-8'),"cha".decode('utf-8')))
+    print(lev_cxt("chak".decode('utf-8'),"hak".decode('utf-8')))

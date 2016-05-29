@@ -8,8 +8,9 @@ def begin_metric(word1,word2):
         return lev.lev_cxt(word1,word2),0
     diff=abs(size1-size2)
     if(size1<size2):
-        short_word=word2[0:size1]
-        return lev.lev_cxt(word1,short_word),diff
+        #short_word=word2[0:size1]
+        #return lev.lev_cxt(word1,short_word),diff
+        return np.inf,np.inf
     else:
         short_word=word1[0:size2]
         return lev.lev_cxt(word2,short_word),diff
@@ -77,7 +78,7 @@ def nearest_k(new_word,keys,k=10,metric=lev.lev_cxt):
     return k_words
 
 @tools.clock
-def nearest_k_eff(new_word,keys,k=7,metric=begin_metric):
+def nearest_k_eff(new_word,keys,k=6,metric=begin_metric):
     best=np.full((k,),np.inf)
     indexes=np.zeros(k,dtype=int)
     best_full=np.inf
