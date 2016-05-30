@@ -48,7 +48,7 @@ def lev_cxt(word1,word2):
                 l1=dist[i-1][j] + 1.0
                 l2=dist[i][j-1] + 1.0
                 l3=dist[i-1][j-1] + full_cost(word1[i-1],word2[j-1])
-                l4=dist[i-2][j-2] + 1.0
+                l4=dist[i-2][j-2] + 0.5
                 dist[i][j]=min([l1,l2,l3,l4])
             else:
                 l1=dist[i-1][j] + 1.0
@@ -80,20 +80,20 @@ def di_correction(token1,token2):
         di=DIGRAPHS[token1]
         code=DIGRAPHS_TO_SPECIAL[di]
         if(code==token2):
-            return 0.2
+            return 0.25
     if(token1 in SPECIAL_TO_DIGRAPH):
         di=SPECIAL_TO_DIGRAPH[token1]
         if(token2==di[0] or token2==di[1]):
-            return 0.2#0.2
+            return 0.25#0.2
     return 0.0
 
 def orth_correction(token1,token2):
     if(token1 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token1]==token2):
-            return 0.1#0.3
+            return 0.25#0.3
     if(token2 in POLISH_TO_LATIN):
         if(POLISH_TO_LATIN[token2]==token1):
-            return 0.1#0.3
+            return 0.25#0.3
     return 0.0#equ(token1,token2)
 
 @tools.clock

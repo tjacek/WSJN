@@ -18,12 +18,6 @@ def build_word_histogram(filename):
     words=tools.find_words(text)
     return build_histogram(words)   
 
-def build_distance_histogram(filename):
-    pairs=tools.read_pairs(filename)
-    dist=[distance.normalized_lev(word1,word2)
-             for word1,word2 in pairs]
-    return build_histogram(dist)  
-
 def build_histogram(words):
     words_dict={}
     for word_i in words:
@@ -34,9 +28,5 @@ def build_histogram(words):
     norm_c=sum(words_dict.values())
     for word_i in words_dict.keys():
     	words_dict[word_i]/=norm_c
-    print(words_dict.values()[0:10])
+    #print(words_dict.values()[0:10])
     return Histogram(words_dict)
-
-#build_word_histogram('resources/lab3/proza.iso.utf8')
-hist=build_distance_histogram('resources/lab3/bledy.txt')
-print(hist.words.keys())
