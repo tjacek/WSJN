@@ -23,11 +23,12 @@ def build_forms_histogram(filename,forms2basic,hist_size=0):
     text=tools.read_text(filename,clean_txt=False)
     words=tools.find_words(text)    
     words=[code_digraphs(word_i) for word_i in words]
-    forms=Set()
-    for word_i in words:
-        if(word_i in forms2basic):
-            forms.update(word_i)
-    forms=list(forms)        
+    forms=[ forms2basic[word_i] for word_i in words
+                     if(word_i in forms2basic)]
+    #print(len(forms))
+    forms=tools.unique_list(forms)#list(forms)        
+    #print(len(forms))
+    #print(forms2basic)
     return build_histogram(forms,laplace_smoothing=True,size=hist_size)   
 
 def build_word_histogram(filename,forms):

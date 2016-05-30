@@ -20,10 +20,13 @@ class Spellchecker(object):
     def correct(self,new_word):
         new_word=code_digraphs(new_word)
         keys=self.forms_dict.all_basic()
-        words=knn.nearest_k(new_word,keys)
+        words=knn.nearest_k(new_word,keys,k=5,metric=normalized_lev)
+        tools.print_unicode(words)
         full_words=self.forms_dict.full_words(words)
         prob_pairs=[ (word_i,self.p(new_word,word_i)) 
                         for word_i in full_words]
+        prob_pairs.sort(key=lambda x: x[1], reverse=True)
+        tools.print_unicode(prob_pairs,to_unicode=lambda p: unicode(p[0]) +' ' + unicode(p[1]))
         return prob_pairs
 
 class CondProb(object):
@@ -44,7 +47,6 @@ def build_spellchecker(begin_file,end_file,
     model=build_distance_histogram(model_path)
     priori=histogram.build_forms_histogram(priori_path,basics,len(forms_dict))
     cond=CondProb(model,priori)
-    #print(basics.keys()[0:10])
     return Spellchecker(cond,basics,forms_dict)
 
 def build_cond_p(model_path,priori_path):
@@ -63,8 +65,7 @@ def normalized_lev(word1,word2):
     return int(4.0*distance.lev_cxt(word1,word2))
 
 spell=build_spellchecker(u'resources/lab3/pocz.dat',u'resources/lab3/konc.dat',
-	               u'resources/lab3/bledy.txt',u'resources/lab3/proza.iso.utf8')
-print(spell.correct(u'mlody'))
-#cond=build_cond_p('resources/lab3/bledy.txt','resources/lab3/proza.iso.utf8')
-#print(cond.priori.k_keys(10))
-#print(cond.p(u'lewym',u'lweym'))
+u'resources/lab3/bledy.txt',u'resources/lab3/proza.iso.utf8')
+#print(spell.cond.model.words)
+#print(spell.cond.priori.words)
+spell.correct(u'mlody')

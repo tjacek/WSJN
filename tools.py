@@ -44,7 +44,6 @@ def read_text(filename,clean_txt=True):
 def read_pairs(filename,sep=';'):
     lines=read_lines(filename,clean_text=True)
     pairs=[ tuple(line_i.split(sep)) for line_i in lines]
-    print(pairs[0:10])
     return pairs 
 
 def clean(text):
@@ -86,6 +85,14 @@ def ui_loop(cls,fun):
 
 def unique_list(list_i):
     return list(set(list_i))
+
+def print_unicode(items,to_unicode=None):
+    if(to_unicode==None):
+        for item_i in items:
+            print(unicode(item_i))
+    else:
+        for item_i in items:
+            print(to_unicode(item_i))
 
 def use_utf8():
     UTF8Writer = codecs.getwriter('utf8')
