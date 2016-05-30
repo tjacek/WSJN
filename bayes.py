@@ -42,7 +42,7 @@ def build_spellchecker(begin_file,end_file,
     forms_dict=build.build_forms(begin_file,end_file)
     basics=forms_dict.forms_to_basic()
     model=build_distance_histogram(model_path)
-    priori=histogram.build_forms_histogram(priori_path,basics)
+    priori=histogram.build_forms_histogram(priori_path,basics,len(forms_dict))
     cond=CondProb(model,priori)
     #print(basics.keys()[0:10])
     return Spellchecker(cond,basics,forms_dict)
@@ -56,7 +56,8 @@ def build_distance_histogram(filename):
     pairs=tools.read_pairs(filename)
     dist=[normalized_lev(word1,word2)
              for word1,word2 in pairs]
-    return histogram.build_histogram(dist)
+    hist_size=max(dist)
+    return histogram.build_histogram(dist,laplace_smoothing=True,size=hist_size)
 
 def normalized_lev(word1,word2):
     return int(4.0*distance.lev_cxt(word1,word2))
