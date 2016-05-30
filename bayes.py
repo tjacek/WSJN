@@ -4,6 +4,7 @@ import forms.build as build
 import metrics.lev as distance
 from metrics.lev import code_digraphs
 import metrics.knn as knn
+import numpy as np
 
 class Spellchecker(object):
     def __init__(self,cond,basic,forms_dict):
@@ -20,13 +21,13 @@ class Spellchecker(object):
     def correct(self,new_word):
         new_word=code_digraphs(new_word)
         keys=self.forms_dict.all_basic()
-        words=knn.nearest_k(new_word,keys,k=5,metric=normalized_lev)
-        tools.print_unicode(words)
+        words=knn.nearest_k(new_word,keys,k=3,metric=norm_begin_metric)
+        #tools.print_unicode(words)
         full_words=self.forms_dict.full_words(words)
         prob_pairs=[ (word_i,self.p(new_word,word_i)) 
                         for word_i in full_words]
         prob_pairs.sort(key=lambda x: x[1], reverse=True)
-        tools.print_unicode(prob_pairs,to_unicode=lambda p: unicode(p[0]) +' ' + unicode(p[1]))
+        #tools.print_unicode(prob_pairs,to_unicode=lambda p: unicode(p[0]) +' ' + unicode(p[1]))
         return prob_pairs
 
 class CondProb(object):
@@ -60,6 +61,12 @@ def build_distance_histogram(filename):
              for word1,word2 in pairs]
     hist_size=max(dist)
     return histogram.build_histogram(dist,laplace_smoothing=True,size=hist_size)
+
+def norm_begin_metric(word1,word2):
+    d,diff=knn.begin_metric(word1,word2)
+    if(d==np.inf):
+        return d
+    return int(4.0*d)
 
 def normalized_lev(word1,word2):
     return int(4.0*distance.lev_cxt(word1,word2))
