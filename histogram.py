@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import tools
 import metrics.lev as distance
+from metrics.lev import code_digraphs
+from sets import Set
 
 class Histogram(object):
 
@@ -16,9 +18,20 @@ class Histogram(object):
     def k_keys(self,k=10):
         return self.words.keys()[0:k]
 
-def build_word_histogram(filename):
+def build_forms_histogram(filename,forms2basic):
     text=tools.read_text(filename,clean_txt=False)
-    words=tools.find_words(text)
+    words=tools.find_words(text)    
+    words=[code_digraphs(word_i) for word_i in words]
+    forms=Set()
+    for word_i in words:
+        if(word_i in forms2basic):
+            forms.update(word_i)
+    forms=list(forms)        
+    return build_histogram(forms,laplace_smoothing=True)   
+
+def build_word_histogram(filename,forms):
+    text=tools.read_text(filename,clean_txt=False)
+    words=tools.find_words(text)    
     return build_histogram(words,laplace_smoothing=True)   
 
 def build_histogram(words,laplace_smoothing=True):
@@ -27,7 +40,7 @@ def build_histogram(words,laplace_smoothing=True):
         if word_i in words_dict:
             words_dict[word_i]=words_dict[word_i]+1.0
         else:
-        	words_dict[word_i]=0.0
+        	words_dict[word_i]=1.0
     if(laplace_smoothing):
         n=sum(words_dict.values())
         m=float(len(words_dict.keys()))

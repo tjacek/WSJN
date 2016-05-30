@@ -2,10 +2,9 @@
 import tools
 import metrics.lev as distance
 import metrics.knn as knn
-from metrics.lev import code_digraphs
 import numpy as np
 
-class Forms(object):
+class FormsDict(object):
     def __init__(self,endings):
         self.endings=endings
 
@@ -42,3 +41,11 @@ class Forms(object):
         keys=self.endings.values()
         lengths=[len(key_i) for key_i in keys]
         return max(lengths)
+
+    def forms_to_basic(self):
+        forms2basic={}
+        for key_i in self.endings:
+            words=self.full_words([key_i])
+            for word_i in words:
+                forms2basic[word_i]=key_i
+        return forms2basic        

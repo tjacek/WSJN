@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import tools
-import codecs
-import sys 
+import sys,codecs
+from metrics.lev import code_digraphs
+from forms import FormsDict
 
 def build_forms(begin_file,end_file):
     begin_lines=tools.read_lines(begin_file,clean_text=False)
@@ -9,7 +10,7 @@ def build_forms(begin_file,end_file):
     end_lines=tools.read_lines(end_file,clean_text=False)
     end=parse_end(end_lines)
     unified=unify_dirs(begin,end)
-    return Forms(unified)
+    return FormsDict(unified)
 
 def parse_begin(lines):
     lines=[line_i.split(u':') for line_i in lines]
