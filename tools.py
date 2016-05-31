@@ -4,6 +4,7 @@ import os,re
 import codecs,sys 
 from collections import defaultdict
 import timeit
+from metrics.lev import decode_digraphs
 
 def find_words(text):
     return re.findall(u'[(a-z)|ż|ź|ć|ź|ń|ó|ł|ą|ę]+', text.lower()) 
@@ -87,11 +88,11 @@ def unique_list(list_i):
     return list(set(list_i))
 
 def print_unicode(items,to_unicode=None):
-    if(to_unicode==None):
-        for item_i in items:
+    for item_i in items:
+        if(to_unicode==None):
+            item_i=decode_digraphs(item_i)
             print(unicode(item_i))
-    else:
-        for item_i in items:
+        else:
             print(to_unicode(item_i))
 
 def use_utf8():
