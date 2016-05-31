@@ -18,16 +18,21 @@ class Spellchecker(object):
         w_form=self.basic[w]
         return self.cond.p(c,w_form)
 
-    def correct(self,new_word):
+    def correct(self,new_word,unique=False):
         new_word=code_digraphs(new_word)
         keys=self.forms_dict.all_basic()
-        words=knn.nearest_k(new_word,keys,k=3,metric=norm_begin_metric)
+        words=knn.nearest_k(new_word,keys,k=5,metric=norm_begin_metric)
         #tools.print_unicode(words)
-        full_words=self.forms_dict.full_words(words)
+        if(unique):
+            full_words=[]
+            for word_i in words:
+                full_word_i=self.forms_dict.full_words([word_i])[0]
+                full_words.append(full_word_i)
+        else:
+            full_words=self.forms_dict.full_words(words)
         prob_pairs=[ (word_i,self.p(new_word,word_i)) 
                         for word_i in full_words]
         prob_pairs.sort(key=lambda x: x[1], reverse=True)
-        #tools.print_unicode(prob_pairs,to_unicode=lambda p: unicode(p[0]) +' ' + unicode(p[1]))
         return prob_pairs
 
 class CondProb(object):
@@ -70,9 +75,3 @@ def norm_begin_metric(word1,word2):
 
 def normalized_lev(word1,word2):
     return int(4.0*distance.lev_cxt(word1,word2))
-
-spell=build_spellchecker(u'resources/lab3/pocz.dat',u'resources/lab3/konc.dat',
-u'resources/lab3/bledy.txt',u'resources/lab3/proza.iso.utf8')
-#print(spell.cond.model.words)
-#print(spell.cond.priori.words)
-spell.correct(u'mlody')
