@@ -48,12 +48,13 @@ def read_pairs(filename,sep=';'):
     return pairs 
 
 def clean(text):
-    text=text.lower()
-    tabu=["\"",",",".","(",")","{","}","!","?"]
-    for token in tabu:
-        text=text.replace(token,"") 
-    text = re.sub("\d+", "", text)
-    return " ".join(text.split())
+    #text=text.lower()
+    #tabu=["\"",",",".","(",")","{","}","!","?"]
+    #for token in tabu:
+    #    text=text.replace(token,"") 
+    #text = re.sub("\d+", "", text)
+    text=find_words(text)
+    return " ".join(text)
 
 def read(path):
     txt = open(path)

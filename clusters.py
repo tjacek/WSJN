@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import tools,ngrams,metrics
- 
+from sets import Set
+
 def clustering(filename):
     lines=tools.read_lines(filename,clean_text=True)
     text=" ".join(lines)
@@ -44,13 +45,41 @@ def get_cluster(cls_center,lines,metric,eps=10.0):
     return inside,outside
 
 def save_cluster(clusters):
-    txt='##########'
-    for cluster_i in clusters:
-        cls_txt='##########\n'
-        for line_i in cluster_i:
-            cls_txt+=line_i+'\n'
-        txt+=cls_txt
+    cls_sep='\n##########\n'
+    clusters=['\n'.join(cluster_i) for cluster_i in clusters]
+    txt=cls_sep.join(clusters)
     return txt 
+
+def clusters_to_sets(clusters):
+    sets={}
+    for cluster_i in clusters:
+        cls_set=Set(cluster_i)
+        for line_i in cls_set:
+            sets[line_i]=cls_set
+    return sets   
+
+def cluster_quality(cls_sets1,cls_sets2):
+    results=[]
+    for line_i in cls_sets1:
+        if not cls_sets2.has_key(line_i):
+            results.append([0.0,0.0,0.0])
+        else:
+            result_i=quality_metrics(cls_sets1[line_i], cls_sets2[line_i])
+            results.append(result_i)
+    size=float(len(results))
+    results=np.array(results,dtype=float)
+    print(results.shape)
+    quality_total=np.sum(results,axis=0)/size
+    print(quality_total)
+    return quality_total
+
+def quality_metrics(norm, answer):
+    common_positive = norm.intersection(answer)
+    print(common_positive)
+    precision = float(len(common_positive)) / len(answer)
+    recall = float(len(common_positive)) / len(norm)
+    f_score=2.0 * (precision * recall) / (precision + recall)
+    return [precision,recall,f_score]
 
 def trivial_metric(word1,word2):
     return float(abs(len(word1)-len(word2)))
