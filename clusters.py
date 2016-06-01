@@ -7,8 +7,8 @@ def clustering(filename):
     lines=tools.read_lines(filename,clean_text=True)
     text=" ".join(lines)
     ngram_metric=ngrams.make_ngram_metric(text,n=2)
-    cluster_lines(lines,metric=ngram_metric)
-
+    return cluster_lines(lines,metric=ngram_metric)
+    
 def read_clusters(filename):
     txt=tools.read_text(filename,clean_txt=False)
     raw_clusters=txt.split("##########")
@@ -29,7 +29,7 @@ def cluster_lines(lines,metric=metrics.l2,eps=0.1):
         unclustered=outside
         clusters.append(cluster)
     print(len(clusters))
-    print(save_cluster(clusters))
+    #print(save_cluster(clusters))
     return clusters
     
 def get_cluster(cls_center,lines,metric,eps=10.0):
@@ -54,8 +54,3 @@ def save_cluster(clusters):
 
 def trivial_metric(word1,word2):
     return float(abs(len(word1)-len(word2)))
-
-LINES_FILE=u'resources/lab4/lines.txt'
-CLUSTER_FILE=u'resources/lab4/clusters.txt'
-clustering(LINES_FILE)
-#read_clusters(CLUSTER_FILE)
